@@ -22,13 +22,15 @@
 (defn- input
   [c form-data key opts]
   (let [on-change #(om/transact! c `[(form/update-val! {:key ~key :val ~(utils/event-value %)})])
-        field-name (name key)]
+        field-name (name key)
+        formatter (or (:formatter opts) #(str %))]
     (dom/div
      #js {:className (or (:className opts) "u-full-width")}
      (dom/label #js {:htmlFor field-name} (str/capitalize field-name))
      (dom/input
       #js {:id field-name
-           :value (or (key form-data) "")
+           :value (or (formatter (key form-data))
+                      "")
            :className "u-full-width"
            :type (or (:type opts) "text")
            :onChange on-change
@@ -41,14 +43,15 @@
 
 
 (defn contribution-form [c adventure]
-  (let [input-for (partial input c adventure)]
+  (let [input-for (partial input c adventure)
+        list #(str/join ", " %)]
     (dom/form
      #js {:onSubmit (partial post-adventure c adventure)
           :className (when (not (empty? adventure)) "submitted")}
      (input-for ::adventures/title)
-     (input-for ::adventures/authors)
+     (input-for ::adventures/authors {:formatter list})
      ;; Edition Dropdown
-     (input-for ::adventures/enemies)
+     (input-for ::adventures/enemies {:formatter list})
      (input-for ::adventures/environment)
      (input-for ::adventures/found-in)
      ;; Yes/No for :handouts
