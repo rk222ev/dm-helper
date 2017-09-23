@@ -1,0 +1,3 @@
+{:require [dm-helper.core]
+ :init-fns [dm-helper.core/init!]
+ :compiler-options {:asset-path "js/main.out"}}
