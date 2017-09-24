@@ -73,8 +73,7 @@
       :className "u-full-width"
       :type (or (:type opts) "text")
       :onChange on-change
-      :min (:min opts)
-      :max (:max opts)})
+      })
      (if-let [error (phrase-first {} key (key form-data))]
        (dom/p
         #js {:className "error-text"}

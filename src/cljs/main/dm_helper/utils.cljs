@@ -34,17 +34,21 @@
   [c]
   (js/console.log (clj->js (dissoc (om/props c) :adventures))))
 
+(defn- js-number?
+  [n]
+  (and (number? n)
+       (not (js/isNaN n))))
+
 (defn ->int
   [s]
-  (js/parseInt s))
+  (let [n (js/parseInt s)]
+    (if (js-number? n) n)))
 
 (defn join-non-nil-strings
   [coll]
   (str/join " " (remove str/blank? coll)))
 
-(defn event-value
-  [e]
-  (.-value (.-target e)))
+(defn event-value [e] (.-value (.-target e)))
 
 ;;; Spec
 

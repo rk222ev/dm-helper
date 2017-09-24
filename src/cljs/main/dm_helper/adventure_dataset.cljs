@@ -2,7 +2,7 @@
   (:require
    [clojure.string :as str]
    [clojure.spec.alpha :as s]
-   [phrase.alpha :refer-macros [defphraser]]))
+   [phrase.alpha :refer [phrase-first] :refer-macros [defphraser]]))
 
 (def editions ["1" "AD&D" "3" "3.5" "4" "5"])
 
@@ -15,32 +15,30 @@
 (s/def ::edition valid-edition?)
 (s/def ::enemies (s/coll-of string? :kind vector? :distinct true))
 (s/def ::environment string?)
-(s/def ::found-in #())
-(s/def ::min-level #())
-(s/def ::max-level #())
-(s/def ::min-characters #())
-(s/def ::max-characters #())
-(s/def ::format #())
-(s/def ::pages #())
-(s/def ::publisher #())
-(s/def ::setting #())
-(s/def ::storyline #())
+(s/def ::found-in string?)
+(s/def ::min-level (s/and number? #(<= 1 % 20)))
+(s/def ::max-level (s/and number? #(<= 1 % 20)))
+(s/def ::min-characters (s/and number? #(<= 1 % 10)))
+(s/def ::max-characters (s/and number? #(<= 1 % 10)))
+(s/def ::format string?)
+(s/def ::pages number?)
+(s/def ::publisher string?)
+(s/def ::setting string?)
+(s/def ::storyline string?)
+
+(s/def :dm-helper/adventure
+  (s/keys :req [::title]
+          :opt [::authors ::edition ::enemies ::environment ::max-level ::min-level
+                ::max-characters ::min-characters ::format ::pages ::publisher ::setting
+                ::storyline]))
 
 (defphraser not-blank?
   [_ _ _]
   "required")
 
-(defphraser (s/coll-of string? :kind vector? :distinct true)
-  [_ _ _]
-  "Must be a list of unique values separated by commas")
-
-(s/conform ::enemies [:hello])
-(s/explain-data ::enemies ["hello" "hello"])
-
-
-(s/def :dm-helper/adventure
-  (s/keys :req-un [::title]
-          :opt-un [::authors ::edition ::enemies]))
+(defphraser #(<= min-number % max-number)
+  [_ {:keys [val via]} _ min-number max-number]
+  (str "Must be a number between " min-number " and " max-number))
 
 (def empty-adventure
   (into (sorted-map)

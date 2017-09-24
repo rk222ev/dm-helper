@@ -4,14 +4,16 @@
    [clojure.string :as str]
    [om.next :as om]
    [om.dom :as dom]
+   [dm-helper.adventure-dataset :as adventures]
    [dm-helper.components :as components]
-   [dm-helper.adventure-dataset :as adventures]))
-
+   [dm-helper.utils :as utils]))
 
 (def ^:private list-formatter
   {:presenter #(str/join ", " %)
    :on-submit #(str/split (str/replace % ", " ",") ",")})
 
+(def ^:private number-formatter
+  {:on-submit utils/->int})
 
 (defn- post-adventure
   [c form e]
@@ -24,7 +26,8 @@
 
 
 (defn contribution-form [c adventure]
-  (let [input-for (partial components/input c adventure)]
+  (let [input-for (partial components/input c adventure)
+        number {:className "three columns" :type "number" :formatter number-formatter}]
     (dom/form
      #js {:onSubmit (partial post-adventure c adventure)}
      (input-for ::adventures/title)
@@ -36,11 +39,11 @@
      ;; Yes/No for :handouts
      #_(input-for :items)
      (dom/div #js {:className "row"}
-              (input-for ::adventures/min-level {:className "three columns" :type "number" :min 1 :max 20})
-              (input-for ::adventures/max-level {:className "three columns" :type "number" :min 1 :max 20}))
+              (input-for ::adventures/min-level number)
+              (input-for ::adventures/max-level number))
      (dom/div #js {:className "row"}
-              (input-for ::adventures/min-characters {:className "three columns" :type "number"})
-              (input-for ::adventures/max-characters {:className "three columns" :type "number"}))
+              (input-for ::adventures/min-characters number)
+              (input-for ::adventures/max-characters number))
      (dom/div #js {:className "row"}
               (input-for ::adventures/format {:className "three columns"}) ;; Dropdown
               (input-for ::adventures/pages {:className "three columns" :type "number"}))
