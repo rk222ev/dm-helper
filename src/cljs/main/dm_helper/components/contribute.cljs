@@ -4,9 +4,8 @@
    [clojure.string :as str]
    [om.next :as om]
    [om.dom :as dom]
-   [phrase.alpha :refer [phrase-first]]
-   [dm-helper.adventure-dataset :as adventures]
-   [dm-helper.utils :as utils]))
+   [dm-helper.components :as components]
+   [dm-helper.adventure-dataset :as adventures]))
 
 
 (def ^:private list-formatter {:presenter #(str/join "," %)
@@ -23,44 +22,8 @@
       (om/transact! c `[(form/update! {:val ~adventures/empty-adventure})]))))
 
 
-(defn- new-value
-  [formatter val]
-  (let [f (:onSubmit formatter)
-        v (utils/event-value val)]
-    (if f
-      (f v)
-      v)))
-
-
-(defn- input
-  [c form-data key opts]
-  (let [formatter (:formatter opts)
-        on-change #(om/transact! c `[(form/update-val! {:key ~key :val ~(new-value formatter %)})])
-        presenter (:presenter formatter)
-        value (key form-data)
-        field-name (name key)]
-    (dom/div
-     #js {:className (or (:className opts) "u-full-width")}
-     (dom/label #js {:htmlFor field-name} (str/capitalize field-name))
-     (dom/input
-      #js {:id field-name
-           :value (or (if presenter
-                        (presenter value)
-                        value)
-                      "")
-      :className "u-full-width"
-      :type (or (:type opts) "text")
-      :onChange on-change
-      :min (:min opts)
-      :max (:max opts)})
-     (if-let [error (phrase-first {} key (key form-data))]
-       (dom/p
-        #js {:className "error-text"}
-        (str "*" (str/capitalize error)))))))
-
-
 (defn contribution-form [c adventure]
-  (let [input-for (partial input c adventure)]
+  (let [input-for (partial components/input c adventure)]
     (dom/form
      #js {:onSubmit (partial post-adventure c adventure)
           :className (when (not (empty? adventure)) "submitted")}
