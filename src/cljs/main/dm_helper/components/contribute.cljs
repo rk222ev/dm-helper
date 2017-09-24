@@ -8,8 +8,9 @@
    [dm-helper.adventure-dataset :as adventures]))
 
 
-(def ^:private list-formatter {:presenter #(str/join "," %)
-                     :onSubmit #(str/split % ",")})
+(def ^:private list-formatter
+  {:presenter #(str/join "," %)
+   :onSubmit #(str/split % ",")})
 
 
 (defn- post-adventure
@@ -25,8 +26,7 @@
 (defn contribution-form [c adventure]
   (let [input-for (partial components/input c adventure)]
     (dom/form
-     #js {:onSubmit (partial post-adventure c adventure)
-          :className (when (not (empty? adventure)) "submitted")}
+     #js {:onSubmit (partial post-adventure c adventure)}
      (input-for ::adventures/title)
      (input-for ::adventures/authors {:formatter list-formatter})
      ;; Edition Dropdown
