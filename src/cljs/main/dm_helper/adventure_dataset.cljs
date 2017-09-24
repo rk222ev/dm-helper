@@ -14,7 +14,7 @@
 (s/def ::authors (s/coll-of string? :kind vector? :distinct true))
 (s/def ::edition valid-edition?)
 (s/def ::enemies (s/coll-of string? :kind vector? :distinct true))
-(s/def ::environment #())
+(s/def ::environment string?)
 (s/def ::found-in #())
 (s/def ::min-level #())
 (s/def ::max-level #())
@@ -26,11 +26,17 @@
 (s/def ::setting #())
 (s/def ::storyline #())
 
-(s/explain-data ::title "")
-
 (defphraser not-blank?
   [_ _ _]
   "required")
+
+(defphraser (s/coll-of string? :kind vector? :distinct true)
+  [_ _ _]
+  "Must be a list of unique values separated by commas")
+
+(s/conform ::enemies [:hello])
+(s/explain-data ::enemies ["hello" "hello"])
+
 
 (s/def :dm-helper/adventure
   (s/keys :req-un [::title]

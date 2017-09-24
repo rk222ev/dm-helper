@@ -47,7 +47,7 @@
 
 (defn- new-value
   [formatter val]
-  (let [f (:onSubmit formatter)
+  (let [f (:on-submit formatter)
         v (utils/event-value val)]
     (if f
       (f v)

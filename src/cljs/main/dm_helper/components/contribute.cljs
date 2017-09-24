@@ -9,8 +9,8 @@
 
 
 (def ^:private list-formatter
-  {:presenter #(str/join "," %)
-   :onSubmit #(str/split % ",")})
+  {:presenter #(str/join ", " %)
+   :on-submit #(distinct (str/split (str/replace % ", " ",") ","))})
 
 
 (defn- post-adventure
@@ -20,7 +20,7 @@
         errors (:cljs.spec/problems validation)]
     (if (s/valid? :dm-helper/adventure form)
       (js/console.log "passed validation")
-      (om/transact! c `[(form/update! {:val ~adventures/empty-adventure})]))))
+      (om/transact! c `[(form/update! {:val ~(or form adventures/empty-adventure)})]))))
 
 
 (defn contribution-form [c adventure]
