@@ -10,7 +10,7 @@
 
 (def ^:private list-formatter
   {:presenter #(str/join ", " %)
-   :on-submit #(distinct (str/split (str/replace % ", " ",") ","))})
+   :on-submit #(str/split (str/replace % ", " ",") ",")})
 
 
 (defn- post-adventure
