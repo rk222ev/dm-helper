@@ -32,37 +32,9 @@
   [_ _ _]
   "required")
 
-;; (defphraser not-blank?
-;;   [_ _ x]
-;;   (format "asd"))
-
-;; ::environment ""
-;; ::format ""
-;; ::found-in ""
-;; ::handouts false
-;; ::items []
-;; ::max-characters 0
-;; ::max-level 0
-;; ::min-characters 0
-;; ::min-level 0
-;; ::pages 0
-;; ::published ""
-;; ::publisher ""
-;; ::setting ""
-;; ::storyline ""
-;; ::summary ""
-;; ::tactical-maps false
-;; ::title ""
-;; ::villains []
-
-
 (s/def :dm-helper/adventure
   (s/keys :req-un [::title]
           :opt-un [::authors ::edition ::enemies]))
-
-#_(s/explain :dm-helper/adventure {:title "a" :authors ["john mcarthy"] :edition "3.5"
-                                 :enemies ["asd"]})
-
 
 (def empty-adventure
   (into (sorted-map)
@@ -75,11 +47,11 @@
          ::found-in ""
          ::handouts false
          ::items []
-         ::max-characters 0
-         ::max-level 0
-         ::min-characters 0
-         ::min-level 0
-         ::pages 0
+         ::max-characters nil
+         ::max-level nil
+         ::min-characters nil
+         ::min-level nil
+         ::pages nil
          ::published ""
          ::publisher ""
          ::setting ""
@@ -88,8 +60,7 @@
          ::tactical-maps false
          ::title ""
          ::villains []
-         })
-  )
+         }))
 
 (def ^:private sort-by-keys (partial into (sorted-map)))
 (def ^:private add-all-keys (partial merge empty-adventure))
