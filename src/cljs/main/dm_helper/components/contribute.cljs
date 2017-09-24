@@ -9,6 +9,10 @@
    [dm-helper.utils :as utils]))
 
 
+(def ^:private list-formatter {:presenter #(str/join "," %)
+                     :onSubmit #(str/split % ",")})
+
+
 (defn- post-adventure
   [c form e]
   (.preventDefault e)
@@ -21,21 +25,30 @@
 
 (defn- input
   [c form-data key opts]
-  (let [on-change #(om/transact! c `[(form/update-val! {:key ~key :val ~(utils/event-value %)})])
-        field-name (name key)
-        formatter (or (:formatter opts) #(str %))]
+  (let [formatter (:formatter opts)
+        do-nothing (fn [x] x)
+        on-change #(om/transact!
+                    c
+                    `[(form/update-val! {:key ~key
+                                        :val ~((or
+                                                (:onSubmit formatter)
+                                                do-nothing)
+                                               (utils/event-value %))})])
+        field-name (name key)]
     (dom/div
      #js {:className (or (:className opts) "u-full-width")}
      (dom/label #js {:htmlFor field-name} (str/capitalize field-name))
      (dom/input
       #js {:id field-name
-           :value (or (formatter (key form-data))
-                      "")
-           :className "u-full-width"
-           :type (or (:type opts) "text")
-           :onChange on-change
-           :min (:min opts)
-           :max (:max opts)})
+      :value (or ((or (:presenter formatter)
+                      do-nothing)
+                  (key form-data))
+                 "")
+      :className "u-full-width"
+      :type (or (:type opts) "text")
+      :onChange on-change
+      :min (:min opts)
+      :max (:max opts)})
      (if-let [error (phrase-first {} key (key form-data))]
        (dom/p
         #js {:className "error-text"}
@@ -43,15 +56,14 @@
 
 
 (defn contribution-form [c adventure]
-  (let [input-for (partial input c adventure)
-        list #(str/join ", " %)]
+  (let [input-for (partial input c adventure)]
     (dom/form
      #js {:onSubmit (partial post-adventure c adventure)
           :className (when (not (empty? adventure)) "submitted")}
      (input-for ::adventures/title)
-     (input-for ::adventures/authors {:formatter list})
+     (input-for ::adventures/authors {:formatter list-formatter})
      ;; Edition Dropdown
-     (input-for ::adventures/enemies {:formatter list})
+     (input-for ::adventures/enemies {:formatter list-formatter})
      (input-for ::adventures/environment)
      (input-for ::adventures/found-in)
      ;; Yes/No for :handouts
