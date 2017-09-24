@@ -1,7 +1,7 @@
 (set-env!
  :source-paths    #{"src/cljs/main" "src/cljc/main"}
  :resource-paths  #{"resources"}
- :dependencies '[[org.clojure/clojure         "1.9.0-alpha17"]
+ :dependencies '[[org.clojure/clojure         "1.9.0-alpha19"]
                  [org.clojure/clojurescript   "1.9.908"]
                  [org.omcljs/om               "1.0.0-beta1"]
                  [compassus                   "1.0.0-alpha3"]
