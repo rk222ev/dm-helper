@@ -23,27 +23,31 @@
       (om/transact! c `[(form/update! {:val ~adventures/empty-adventure})]))))
 
 
+(defn- new-value
+  [formatter val]
+  (let [f (:onSubmit formatter)
+        v (utils/event-value val)]
+    (if f
+      (f v)
+      v)))
+
+
 (defn- input
   [c form-data key opts]
   (let [formatter (:formatter opts)
-        do-nothing (fn [x] x)
-        on-change #(om/transact!
-                    c
-                    `[(form/update-val! {:key ~key
-                                        :val ~((or
-                                                (:onSubmit formatter)
-                                                do-nothing)
-                                               (utils/event-value %))})])
+        on-change #(om/transact! c `[(form/update-val! {:key ~key :val ~(new-value formatter %)})])
+        presenter (:presenter formatter)
+        value (key form-data)
         field-name (name key)]
     (dom/div
      #js {:className (or (:className opts) "u-full-width")}
      (dom/label #js {:htmlFor field-name} (str/capitalize field-name))
      (dom/input
       #js {:id field-name
-      :value (or ((or (:presenter formatter)
-                      do-nothing)
-                  (key form-data))
-                 "")
+           :value (or (if presenter
+                        (presenter value)
+                        value)
+                      "")
       :className "u-full-width"
       :type (or (:type opts) "text")
       :onChange on-change
