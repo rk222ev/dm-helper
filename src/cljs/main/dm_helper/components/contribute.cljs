@@ -19,15 +19,17 @@
   [c form e]
   (.preventDefault e)
   (let [validation (s/explain-data :dm-helper/adventure form)
+        f (into {} (remove (comp nil? second)) (or form adventures/empty-adventure))
         errors (:cljs.spec/problems validation)]
-    (if (s/valid? :dm-helper/adventure form)
+    (if (s/valid? :dm-helper/adventure f)
       (js/console.log "passed validation")
-      (om/transact! c `[(form/update! {:val ~(or form adventures/empty-adventure)})]))))
+      (om/transact! c `[(form/update! {:val ~f})]))))
 
 
 (defn contribution-form [c adventure]
   (let [input-for (partial components/input c adventure)
         number {:className "three columns" :type "number" :formatter number-formatter}]
+    (utils/log c)
     (dom/form
      #js {:onSubmit (partial post-adventure c adventure)}
      (input-for ::adventures/title)

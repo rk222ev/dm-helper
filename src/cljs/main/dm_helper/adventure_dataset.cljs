@@ -4,24 +4,25 @@
    [clojure.spec.alpha :as s]
    [phrase.alpha :refer [phrase-first] :refer-macros [defphraser]]))
 
-(def editions ["1" "AD&D" "3" "3.5" "4" "5"])
+(def editions ["" "1" "AD&D" "3" "3.5" "4" "5"])
 
 (def ^:private not-blank? (complement str/blank?))
 (defn- valid-edition? [s] (boolean ((into #{} editions) s)))
+(def none-or-string string?)
 
 (s/def ::title (s/and string? not-blank?))
 (s/def ::summary (s/and string? not-blank?))
 (s/def ::authors (s/coll-of string? :kind vector? :distinct true))
 (s/def ::edition valid-edition?)
 (s/def ::enemies (s/coll-of string? :kind vector? :distinct true))
-(s/def ::environment string?)
-(s/def ::found-in string?)
+(s/def ::environment none-or-string)
+(s/def ::found-in none-or-string)
 (s/def ::min-level (s/and number? #(<= 1 % 20)))
 (s/def ::max-level (s/and number? #(<= 1 % 20)))
 (s/def ::min-characters (s/and number? #(<= 1 % 10)))
 (s/def ::max-characters (s/and number? #(<= 1 % 10)))
-(s/def ::format string?)
-(s/def ::pages number?)
+(s/def ::format none-or-string)
+(s/def ::pages (s/or :empty nil? :number number?))
 (s/def ::publisher string?)
 (s/def ::setting string?)
 (s/def ::storyline string?)
@@ -36,6 +37,10 @@
   [_ _ _]
   "required")
 
+(defphraser string?
+  [_ _ _]
+  "required")
+
 (defphraser #(<= min-number % max-number)
   [_ {:keys [val via]} _ min-number max-number]
   (str "Must be a number between " min-number " and " max-number))
@@ -43,31 +48,33 @@
 (def empty-adventure
   (into (sorted-map)
         {
-         ::authors []
-         ::edition ""
-         ::enemies []
-         ::environment ""
-         ::format ""
-         ::found-in ""
-         ::handouts false
-         ::items []
+         ::authors nil
+         ::edition nil
+         ::enemies nil
+         ::environment nil
+         ::format nil
+         ::found-in nil
+         ::handouts nil
+         ::items nil
          ::max-characters nil
          ::max-level nil
          ::min-characters nil
          ::min-level nil
          ::pages nil
-         ::published ""
-         ::publisher ""
-         ::setting ""
-         ::storyline ""
-         ::summary ""
-         ::tactical-maps false
+         ::published nil
+         ::publisher nil
+         ::setting nil
+         ::storyline nil
+         ::summary nil
+         ::tactical-maps nil
          ::title ""
-         ::villains []
+         ::villains nil
          }))
 
 (def ^:private sort-by-keys (partial into (sorted-map)))
 (def ^:private add-all-keys (partial merge empty-adventure))
+
+(phrase-first {} ::title nil)
 
 (def
   data

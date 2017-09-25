@@ -74,7 +74,9 @@
       :type (or (:type opts) "text")
       :onChange on-change
       })
-     (if-let [error (phrase-first {} key (key form-data))]
+     (if-let [error (and (not (nil? form-data))
+                         (contains? form-data key)
+                         (phrase-first {} key (key form-data)))]
        (dom/p
         #js {:className "error-text"}
         (str "*" (str/capitalize error)))))))

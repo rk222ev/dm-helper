@@ -74,7 +74,6 @@
   (render
    [this]
    (let [{:keys [form/adventure form/errors]} (om/props this)]
-     (utils/log this)
      (view
       (dom/main
        nil
